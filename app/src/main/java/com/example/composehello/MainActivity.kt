@@ -1,5 +1,6 @@
 package com.example.composehello
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -32,7 +34,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun InflateList() {
     Surface(color = Color.White) {
-        val famousQuotes=DataHelper().quotesMaker()
+        val famousQuotes = DataHelper().quotesMaker()
         LazyColumn() {
             item {
                 famousQuotes.forEach { quote ->
@@ -62,10 +64,21 @@ fun Greeting(name: String) {
 
 @Composable
 fun Counter() {
+    val context = LocalContext.current
     val counter = remember {
         mutableStateOf(0)
     }
-    Button(onClick = { counter.value++ }) {
+    Button(
+        onClick = {
+            counter.value++
+        }, colors = ButtonDefaults.buttonColors(
+            backgroundColor = if (counter.value >= 7) {
+                Color.Green
+            } else {
+                Color.Cyan
+            }
+        )
+    ) {
         Text(text = "I have been clicked ${counter.value} times")
     }
 }
@@ -73,5 +86,5 @@ fun Counter() {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    InflateList()
+
 }
