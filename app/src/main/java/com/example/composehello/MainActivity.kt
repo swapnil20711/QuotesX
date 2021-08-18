@@ -1,28 +1,37 @@
 package com.example.composehello
 
-import android.content.Intent
+import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
+lateinit var scaffoldState: ScaffoldState
+lateinit var scope: CoroutineScope
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Scaffold(topBar = {
+            scaffoldState = rememberScaffoldState()
+            scope = rememberCoroutineScope()
+            Scaffold(scaffoldState = scaffoldState, topBar = {
                 TopAppBar(title = { Text(text = "Quotes X") })
             }, content = {
                 InflateList()
@@ -54,32 +63,49 @@ private fun InflateList() {
 
 @Composable
 fun Greeting(name: String) {
+    var isSelected by remember {
+        mutableStateOf(false)
+    }
+    val backgroundColor by animateColorAsState(
+        if (isSelected) {
+            Color.Green
+        } else {
+            Color.Transparent
+        }
+    )
     Text(
         text = name,
         Modifier
             .padding(12.dp)
             .fillMaxWidth()
+            .background(backgroundColor, RectangleShape)
+            .clickable {
+                isSelected=!isSelected
+            }
     )
 }
 
 @Composable
 fun Counter() {
-    val context = LocalContext.current
-    val counter = remember {
+    var counter by remember {
         mutableStateOf(0)
     }
     Button(
         onClick = {
-            counter.value++
+            counter++
         }, colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (counter.value >= 7) {
+            backgroundColor = if (counter >= 7) {
                 Color.Green
             } else {
                 Color.Cyan
             }
         )
     ) {
-        Text(text = "I have been clicked ${counter.value} times")
+        Text(text = "I have been clicked $counter times")
+        if (counter == 7) {
+            scope.launch {
+            }
+        }
     }
 }
 
